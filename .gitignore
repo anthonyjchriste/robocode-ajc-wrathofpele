@@ -1,6 +1,8 @@
-*.class
+# Maven derived files that should not be committed
+target/*
 
-# Package Files #
-*.jar
-*.war
-*.ear
+# Eclipse derived files that should not be committed
+.settings/*
+
+# Robocode derived files that should not be committed
+config/*
