@@ -17,11 +17,6 @@ public class RobotUtilities {
   private AdvancedRobot robot;
 
   /**
-   * Enables debugging to Robocode output stream.
-   */
-  private boolean doDebug;
-
-  /**
    * Defines the four walls of the Robocode playing area.
    */
   public static enum Wall {
@@ -47,9 +42,7 @@ public class RobotUtilities {
     if (robot == null) {
       throw new IllegalArgumentException("RobotUtilities expects instance of AdvancedRobot");
     }
-
     this.robot = robot;
-    this.doDebug = false;
   }
 
   /**
@@ -64,41 +57,25 @@ public class RobotUtilities {
   }
 
   /**
-   * Enables to disables debug messages.
-   * 
-   * @param doDebug True enables debugging and False disables debugging.
-   */
-  public void setDoDebug(boolean doDebug) {
-    this.doDebug = doDebug;
-  }
-
-  /**
-   * If debugging is enabled, prints a debug message to the robot's console.
-   * 
-   * @param msg The message to print in the robot's console.
-   */
-  public void debug(String msg) {
-    if (doDebug) {
-      robot.out.println("DEBUG: " + msg);
-    }
-  }
-
-  /**
    * Calculates the power for firing proportional to the distance of the opponent.
    * 
-   * The max distance is is calculated as the length of the line from the bottom left corner to the
-   * top right corner. The firing power is then linear from 0 pixels away being full power to the
+   * The max distance is is calculated as max(height, width). 
+   * The firing power is then linear from [0 to width of robot] pixels away being full power to the
    * max distance away being the lowest power.
-   * 
+   *  
    * @param distance The distance of the object from the tank.
    * @return The linear proportional power based on the enemy's distance.
    */
   public double getProportionalFirePower(double distance) {
-    double maxDistance = Math.hypot(robot.getBattleFieldHeight(), robot.getBattleFieldWidth());
+    // If we are up against a robot, fire at full power
+    if (distance <= robot.getWidth()) {
+      return Rules.MAX_BULLET_POWER;
+    }
+  
+    double maxDistance = Math.max(robot.getBattleFieldWidth(), robot.getBattleFieldHeight());
     double deltaY = Rules.MAX_BULLET_POWER - Rules.MIN_BULLET_POWER;
     double deltaX = 0 - maxDistance;
     double slope = deltaY / deltaX;
-
     return Rules.MAX_BULLET_POWER - Math.abs(slope * distance);
   }
 

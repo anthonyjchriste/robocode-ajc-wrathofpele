@@ -213,7 +213,7 @@
 						<configuration>
 							<check>
 								<classRatio>100</classRatio>
-								<methodRatio>100</methodRatio>
+								<methodRatio>85</methodRatio>
 							</check>
 						</configuration>
 					</execution>

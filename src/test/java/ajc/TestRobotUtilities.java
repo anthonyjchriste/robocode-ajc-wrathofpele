@@ -11,7 +11,16 @@ import org.junit.Test;
 public class TestRobotUtilities {
 
   /**
-   * Test boundary conditions to make sure we always reveived the opposite angle.
+   * Tests that passing null to the constructor throws an exception. 
+   */
+  @SuppressWarnings("unused")
+  @Test(expected = IllegalArgumentException.class)
+  public void testNullConstructor() {
+    RobotUtilities utils = new RobotUtilities(null);
+  }
+  
+  /**
+   * Test boundary conditions to make sure we always received the opposite angle.
    */
   @Test
   public void testOppositeAngle() {

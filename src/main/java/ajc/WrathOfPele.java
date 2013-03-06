@@ -4,6 +4,7 @@ import robocode.AdvancedRobot;
 import robocode.Condition;
 import robocode.CustomEvent;
 import robocode.HitRobotEvent;
+import robocode.Rules;
 import robocode.ScannedRobotEvent;
 import robocode.util.Utils;
 import robocode.WinEvent;
@@ -11,6 +12,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import ajc.WallProximityEvent.EventTrigger;
 
 /**
  * A competitive Robocode robot that uses stop-and-go for defense, circular movements, and
@@ -30,7 +32,7 @@ public final class WrathOfPele extends AdvancedRobot {
    * Instance of utilities class associated with this robot.
    */
   private RobotUtilities utils;
-  
+
   /**
    * private RobotUtilities utils = new RobotUtilities(this); Indicates what this robot believes if
    * forward in relation to the front or back of its body.
@@ -71,11 +73,12 @@ public final class WrathOfPele extends AdvancedRobot {
       if (this.getVelocity() < 3 && !nearWall) {
         this.moveInArc();
       }
-      
+
       // The robot is "stuck" on a wall
       if (nearWall && this.getVelocity() == 0) {
         this.switchForward();
-        ahead(100);
+        this.moveInArc();
+        //ahead(100);
       }
       // Scan for other robots
       this.setTurnRadarLeft(360);
@@ -131,7 +134,7 @@ public final class WrathOfPele extends AdvancedRobot {
     }
     // Forward is back
     else {
-      super.setBack(distance); 
+      super.setBack(distance);
     }
   }
 
@@ -145,7 +148,6 @@ public final class WrathOfPele extends AdvancedRobot {
     this.scannedRobots = new HashMap<>();
     this.random = new Random(System.currentTimeMillis());
     utils.setTeamColors();
-    utils.setDoDebug(true);
     this.addCustomEvent(new WallProximityEvent(this,
         WallProximityEvent.EventTrigger.WALL_PROXIMITY, 40.0));
     this.addCustomEvent(new FiredUponEvent(scannedRobots));
@@ -159,17 +161,33 @@ public final class WrathOfPele extends AdvancedRobot {
   }
 
   /**
-   * Causes this robot to move in arcs.
+   * Causes this robot to move in arcs with a set distance.
+   * 
+   * @param distance The distance this robot will move during the arc.
+   */
+  private void moveInArc(double distance) {
+    // Cause robot to turn between 30 and 75 degrees to left or right
+    double randomDelta = random.nextInt(45) + 30;
+    randomDelta = randomDelta * (random.nextBoolean() ? 1 : -1);
+    setHeading(this.getHeading() + randomDelta);
+    
+    // If distance is negative, then choose a random distance
+    if (distance < 0) {
+      setAhead(random.nextInt(300) + 100); 
+    } 
+    // Otherwise, use the given distance
+    else {
+      setAhead(distance);
+    }
+    
+    this.execute();
+  }
+  
+  /**
+   * Causes this robot to move in arcs with a random distance.
    */
   private void moveInArc() {
-      utils.debug("move in arc");
-      //Cause robot to turn between 30 and 75 degrees to left or right
-      double randomDelta = random.nextInt(45) + 30;
-      randomDelta = randomDelta * (random.nextBoolean() ? 1 : -1);
-      setHeading(this.getHeading() + randomDelta);
-      setAhead(random.nextInt(300) + 100);
-      this.execute();
-    
+    moveInArc(-1);
   }
 
   /**
@@ -188,9 +206,7 @@ public final class WrathOfPele extends AdvancedRobot {
    */
   @Override
   public void onHitRobot(HitRobotEvent evt) {
-    this.switchForward();
-    this.setAhead(100);
-    this.execute();
+    this.moveInArc();
   }
 
   /**
@@ -201,7 +217,6 @@ public final class WrathOfPele extends AdvancedRobot {
   @Override
   public void onScannedRobot(ScannedRobotEvent evt) {
     if (!nearWall) {
-      
       // Square off against enemy
       // From http://mark.random-article.com/robocode/basic_movement.html
       this.setTurnRight(evt.getBearing() + 90);
@@ -216,15 +231,21 @@ public final class WrathOfPele extends AdvancedRobot {
 
       // Determine relative angles needed to turn radar and gun, and then turn them.
       double radarTurnAngle =
-          RobotUtilities.getTargetTurnAngle(super.getHeading(), this.getRadarHeading(), 
+          RobotUtilities.getTargetTurnAngle(super.getHeading(), this.getRadarHeading(),
               evt.getBearing());
       double gunTurnAngle =
-          RobotUtilities.getTargetTurnAngle(super.getHeading(), this.getGunHeading(), 
+          RobotUtilities.getTargetTurnAngle(super.getHeading(), this.getGunHeading(),
               evt.getBearing());
 
       this.setTurnRadarRight(Utils.normalRelativeAngleDegrees(radarTurnAngle));
       this.setTurnGunRight(Utils.normalRelativeAngleDegrees(gunTurnAngle));
-      this.setFire(utils.getProportionalFirePower(evt.getDistance()));
+      
+      // Make sure our gun is actually pointing at the robot before firing
+      // Also ensure that the gun is cool before firing
+      // Inspired from http://mark.random-article.com/robocode/basic_targeting.html
+      if (Math.abs(this.getGunTurnRemaining()) < 5 && this.getGunHeat() == 0) {
+        this.setFire(utils.getProportionalFirePower(evt.getDistance()));
+      }
       this.execute();
     }
   }
@@ -239,15 +260,15 @@ public final class WrathOfPele extends AdvancedRobot {
     Color[] rainbow =
         { Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN, Color.BLUE, Color.MAGENTA };
     int i = 0;
+    this.setTurnRight(Double.POSITIVE_INFINITY);
+    this.setTurnGunLeft(Double.POSITIVE_INFINITY);
+    this.setTurnRadarRight(Double.POSITIVE_INFINITY);
     while (true) {
-      this.setTurnRight(360);
-      this.setTurnGunLeft(360);
-      this.setTurnRadarRight(360);
       this.setBodyColor(rainbow[i % rainbow.length]);
       this.setGunColor(rainbow[(i + 1) % rainbow.length]);
       this.setRadarColor(rainbow[(i + 2) % rainbow.length]);
       this.setBulletColor(rainbow[(i + 3) % rainbow.length]);
-      this.setFire(0.1);
+      this.setFire(Rules.MAX_BULLET_POWER);
       this.execute();
       i++;
     }
@@ -270,7 +291,7 @@ public final class WrathOfPele extends AdvancedRobot {
       onFiredUponEvent((FiredUponEvent) condition);
       break;
     default:
-      utils.debug("unknown event " + condition.getName());
+      // This should not occur
       break;
     }
   }
@@ -284,43 +305,40 @@ public final class WrathOfPele extends AdvancedRobot {
    * @param evt The event object associated with this event.
    */
   private void onWallProximityEvent(WallProximityEvent evt) {
-    utils.debug(evt.getName() + " " + evt.getEventTrigger() + " " + evt.getWallsInViolation());
     this.removeCustomEvent(evt);
-    switch (evt.getEventTrigger()) {
-    case WALL_PROXIMITY:
+
+    if (evt.getEventTrigger().equals(EventTrigger.WALL_PROXIMITY)) {
       this.nearWall = true;
-      this.switchForward();
-      ahead(evt.getMinSafeDistance() * 1.5);
+      
       // Make sure we now wait on robot returning to safe distance
       this.addCustomEvent(new WallProximityEvent(this,
-          WallProximityEvent.EventTrigger.SAFE_PROXIMITY, evt.getMinSafeDistance())); 
-      break;
-    case SAFE_PROXIMITY:
+          WallProximityEvent.EventTrigger.SAFE_PROXIMITY, evt.getMinSafeDistance()));
+      
+      // Move away from the wall
+      this.switchForward();
+      this.ahead(evt.getMinSafeDistance() * 1.5);
+     
+    }
+    else {
       this.nearWall = false;
       // Robot has returned to a safe distance, re-enable wall priority
       this.addCustomEvent(new WallProximityEvent(this,
           WallProximityEvent.EventTrigger.WALL_PROXIMITY, evt.getMinSafeDistance()));
-      break;
-    default:
-      // Nothing should happen otherwise.
-      utils.debug("default label in WallProximityEvent");
-      break;
     }
   }
 
   /**
    * This event is fired when this robot detects an energy drop in the enemy robot.
    * 
-   * This event causes this robot to switch direction and move a random distance as defensive 
+   * This event causes this robot to switch direction and move a random distance as defensive
    * movement.
    * 
    * @param evt The event object associated with this event.
    */
   private void onFiredUponEvent(FiredUponEvent evt) {
     if (!nearWall) {
-      utils.debug("Fired upon");
       this.switchForward();
-      this.setAhead(random.nextInt(200) + 50);
+      this.moveInArc(random.nextInt(200) + 50);
       this.execute();
     }
   }

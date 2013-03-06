@@ -51,7 +51,7 @@ public class TestWrathOfPeleVersusCrazy extends RobotTestBed {
 
     // Check to make sure WrathOfPele wins 70% percent of the rounds.
     assertTrue("Check WrathOfPele winner", 
-        (double) wrathOfPeleResults.getFirsts() / (double) getNumRounds() >= .70);;
+        (double) wrathOfPeleResults.getFirsts() / (double) getNumRounds() >= .70);
   }
 
 }

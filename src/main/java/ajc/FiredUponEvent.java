@@ -1,7 +1,7 @@
 package ajc;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 import robocode.Condition;
 
 /**
@@ -14,14 +14,14 @@ public class FiredUponEvent extends Condition {
   /**
    * Reference to scanned robots with energy history. 
    */
-  private HashMap<String, ArrayList<Double>> scannedRobots;
+  private Map<String, ArrayList<Double>> scannedRobots;
 
   /**
    * Adds the FiredUponEvent to the event queue with the relevant robot histories.
    * 
    * @param scannedRobots Map containing list of scanned robots and energy histories.
    */
-  public FiredUponEvent(HashMap<String, ArrayList<Double>> scannedRobots) {
+  public FiredUponEvent(Map<String, ArrayList<Double>> scannedRobots) {
     super("FiredUponEvent");
     this.scannedRobots = scannedRobots;
   }
@@ -32,6 +32,9 @@ public class FiredUponEvent extends Condition {
    * 
    * This method compares the last two scanned energies of a robot to determine if there has been
    * an energy drop. 
+   * 
+   * We also attempt to determine if the energy drop was due to one of our bullets hitting the 
+   * enemy.
    * 
    * @return <i>true</i> if the energy dropped in a scanned robot and <i> false otherwise.
    */

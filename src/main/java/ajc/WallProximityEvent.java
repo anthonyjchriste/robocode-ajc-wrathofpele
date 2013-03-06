@@ -56,17 +56,6 @@ public class WallProximityEvent extends Condition {
   }
 
   /**
-   * Creates a WallProximityEvent with a default <i>minSafeDistance</i> set to 20px.
-   * 
-   * @param robot The robot associated with this event.
-   * @param triggerOn The trigger enum associated with causing this event to fire.
-   * @see EventTrigger
-   */
-  public WallProximityEvent(AdvancedRobot robot, EventTrigger triggerOn) {
-    this(robot, triggerOn, 20.0);
-  }
-
-  /**
    * Creates a WallProximityEvent with a custom <i>minSafeDistance</i>.
    * 
    * @param robot The robot associated with this event.
@@ -103,29 +92,18 @@ public class WallProximityEvent extends Condition {
     this.findWallsInViolation(robot.getX(), robot.getY(), robot.getBattleFieldHeight(),
         robot.getBattleFieldWidth());
 
-    switch (triggerOn) {
-    case WALL_PROXIMITY:
+    if (this.triggerOn.equals(EventTrigger.WALL_PROXIMITY)) {
       if (this.wallsInViolation.size() > 0) {
         fireEvent = true;
       }
-      break;
-    case SAFE_PROXIMITY:
-      if (this.wallsInViolation.size() == 0) {
+    }
+    else {
+      if (this.wallsInViolation.size() <= 0) {
         fireEvent = true;
       }
-      break;
     }
-
+    
     return fireEvent;
-  }
-
-  /**
-   * Return the closest wall that caused this event to trigger.
-   * 
-   * @return The closest wall that caused this event to trigger.
-   */
-  public Set<Wall> getWallsInViolation() {
-    return this.wallsInViolation;
   }
 
   /**
@@ -155,10 +133,6 @@ public class WallProximityEvent extends Condition {
    * @param width The width of the playing field.
    */
   private void findWallsInViolation(double x, double y, double height, double width) {
-    if (wallsInViolation == null) {
-      throw new IllegalArgumentException();
-    }
-
     // Make sure the list is empty from the last scan.
     this.wallsInViolation.clear();
 
