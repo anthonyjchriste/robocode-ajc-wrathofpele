@@ -25,7 +25,7 @@ import ajc.WallProximityEvent.EventTrigger;
  * thinks is front.
  * 
  * @author Anthony Christe
- * 
+ *
  */
 public final class WrathOfPele extends AdvancedRobot {
   /**

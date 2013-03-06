@@ -11,7 +11,7 @@ import org.junit.Test;
 public class TestRobotUtilities {
 
   /**
-   * Tests that passing null to the constructor throws an exception. 
+   * Tests that passing null to the constructor throws an exception.
    */
   @SuppressWarnings("unused")
   @Test(expected = IllegalArgumentException.class)

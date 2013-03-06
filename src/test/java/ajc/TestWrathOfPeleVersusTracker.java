@@ -19,7 +19,7 @@ public class TestWrathOfPeleVersusTracker extends RobotTestBed {
    * Specifies that Tracker and WrathOfPele are to be matched up in this test case.
    * 
    * @return The comma-delimited list of robots in this match.
-   */
+   */ 
   @Override
   public String getRobotNames() {
     return "sample.Tracker,ajc.WrathOfPele";
