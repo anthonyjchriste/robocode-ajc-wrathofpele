@@ -21,7 +21,7 @@ public class TestWrathOfPeleFiring extends RobotTestBed {
    * 
    * @return The comma-delimited list of robots in this match.
    */
-  @Override
+  @Override 
   public String getRobotNames() {
     return "sample.SittingDuck,ajc.WrathOfPele";
   }

@@ -1,4 +1,4 @@
-package ajc;
+package ajc; 
 
 import robocode.AdvancedRobot;
 import robocode.Rules;

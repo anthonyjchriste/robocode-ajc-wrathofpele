@@ -19,7 +19,7 @@ public class TestWrathOfPeleVersusSittingDuck extends RobotTestBed {
    * Specifies that SittingDuck and WrathOfPele are to be matched up in this test case.
    * 
    * @return The comma-delimited list of robots in this match.
-   */
+   */ 
   @Override
   public String getRobotNames() {
     return "sample.SittingDuck,ajc.WrathOfPele";

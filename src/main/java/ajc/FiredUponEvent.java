@@ -6,7 +6,7 @@ import robocode.Condition;
 
 /**
  * This event is fired when our detects an energy drop in an enemy robot being scanned.
- * 
+ *
  * @author Anthony Christe
  * 
  */

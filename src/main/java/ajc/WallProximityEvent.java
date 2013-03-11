@@ -10,7 +10,7 @@ import robocode.Condition;
  * This event fires whenever a robot is too close to one of the four walls.
  *
  * @author Anthony Christe
- * 
+ *
  */
 public class WallProximityEvent extends Condition {
   /**
