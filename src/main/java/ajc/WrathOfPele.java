@@ -17,18 +17,19 @@
 
 package ajc;
 
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
 import robocode.AdvancedRobot;
+import robocode.BulletHitEvent;
 import robocode.Condition;
 import robocode.CustomEvent;
 import robocode.HitRobotEvent;
 import robocode.Rules;
 import robocode.ScannedRobotEvent;
-import robocode.util.Utils;
 import robocode.WinEvent;
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
+import robocode.util.Utils;
 import ajc.WallProximityEvent.EventTrigger;
 
 /**
@@ -77,6 +78,11 @@ public final class WrathOfPele extends AdvancedRobot {
    */
   private boolean nearWall = false;
 
+  /**
+   * Keeps track of the damage dealth by this robot's last bullet on an enemy robot.
+   */
+  private Double lastBulletHitEnergy = 0.0;
+  
   /**
    * Setup, scan for, and attack enemy robots.
    */
@@ -167,7 +173,7 @@ public final class WrathOfPele extends AdvancedRobot {
     utils.setTeamColors();
     this.addCustomEvent(new WallProximityEvent(this,
         WallProximityEvent.EventTrigger.WALL_PROXIMITY, 40.0));
-    this.addCustomEvent(new FiredUponEvent(scannedRobots));
+    this.addCustomEvent(new FiredUponEvent(this.scannedRobots, this.lastBulletHitEnergy));
   }
 
   /**
@@ -226,6 +232,19 @@ public final class WrathOfPele extends AdvancedRobot {
     this.moveInArc();
   }
 
+  /**
+   * Determines if one of our bullets has hit an enemy robot. 
+   * 
+   * If one of our bullets does his an enemy robot, keep track of the damage it has done so the
+   * firedUpon event doesn't fire from damage energy loss to our own bullets.
+   * 
+   * @param evt The event that is fired when one of this robots bullets hits an enemy robot.
+   */
+  @Override
+  public void onBulletHit(BulletHitEvent evt) {
+    this.lastBulletHitEnergy = evt.getEnergy();
+  }
+  
   /**
    * Tracks, records energy levels of, and fires upon enemy robots.
    * 

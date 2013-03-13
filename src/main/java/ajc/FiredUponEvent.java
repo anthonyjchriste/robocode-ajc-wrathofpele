@@ -31,15 +31,20 @@ public class FiredUponEvent extends Condition {
    * Reference to scanned robots with energy history. 
    */
   private Map<String, ArrayList<Double>> scannedRobots;
+  
+  private double lastBulletHitEnergy;
 
   /**
    * Adds the FiredUponEvent to the event queue with the relevant robot histories.
    * 
    * @param scannedRobots Map containing list of scanned robots and energy histories.
+   * @param lastBulletHitDamage Stores the amount of damage one of our robots caused on the last
+   *         direct hit.
    */
-  public FiredUponEvent(Map<String, ArrayList<Double>> scannedRobots) {
+  public FiredUponEvent(Map<String, ArrayList<Double>> scannedRobots, Double lastBulletHitDamage) {
     super("FiredUponEvent");
     this.scannedRobots = scannedRobots;
+    this.lastBulletHitEnergy = lastBulletHitDamage;
   }
 
   /**
@@ -57,14 +62,29 @@ public class FiredUponEvent extends Condition {
   @Override
   public boolean test() {
     int size;
+    double energyDelta;
     ArrayList<Double> energies;
 
     for (String enemy : scannedRobots.keySet()) {
       energies = scannedRobots.get(enemy);
       size = energies.size();
-
-      if (size > 2 && ((energies.get(size - 2) - energies.get(size - 1)) > 0)) {
-        energies.clear();
+      
+      if (size > 1 && robocode.util.Utils.isNear(energies.get(size - 1), 
+          this.lastBulletHitEnergy)) {
+        return false;
+      }
+      
+      if (size > 2) {
+        energyDelta = energies.get(size - 2) - energies.get(size - 1);
+      }
+      else {
+        return false;
+      }
+      
+      
+      
+      if (energyDelta > 0) {
+        energies.removeAll(energies.subList(0, size - 1));
         return true;
       }
     }

@@ -43,13 +43,13 @@ public class TestWrathOfPeleVersusFire extends RobotTestBed {
   }
 
   /**
-   * This test runs for 10 rounds.
+   * This test runs for 20 rounds.
    * 
    * @return The number of rounds.
    */
   @Override
   public int getNumRounds() {
-    return 10;
+    return 20;
   }
 
   /**

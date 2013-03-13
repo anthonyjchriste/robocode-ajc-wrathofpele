@@ -43,17 +43,17 @@ public class TestWrathOfPeleVersusRamFire extends RobotTestBed {
   }
 
   /**
-   * This test runs for 10 rounds.
+   * This test runs for 20 rounds.
    * 
    * @return The number of rounds.
    */
   @Override
   public int getNumRounds() {
-    return 10;
+    return 20;
   }
 
   /**
-   * The actual test, which asserts that WrathOfPele has won 70% of rounds against RamFire.
+   * The actual test, which asserts that WrathOfPele has won 60% of rounds against RamFire.
    * 
    * @param event Details about the completed battle.
    */
@@ -66,8 +66,8 @@ public class TestWrathOfPeleVersusRamFire extends RobotTestBed {
     String robotName = wrathOfPeleResults.getTeamLeaderName();
     assertEquals("Check that results[1] is WrathOfPele", "ajc.WrathOfPele*", robotName);
 
-    // Check to make sure WrathOfPele wins 70% percent of the rounds.
+    // Check to make sure WrathOfPele wins 60% percent of the rounds.
     assertTrue("Check WrathOfPele winner", 
-        (double) wrathOfPeleResults.getFirsts() / (double) getNumRounds() >= .70);
+        (double) wrathOfPeleResults.getFirsts() / (double) getNumRounds() >= .60);
   }
 }
